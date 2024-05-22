@@ -1,4 +1,4 @@
-package com.example.convidados_app.ui
+package com.example.convidados_app.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
