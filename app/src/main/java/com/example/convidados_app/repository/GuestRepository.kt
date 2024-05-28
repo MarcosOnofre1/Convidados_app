@@ -1,7 +1,17 @@
 package com.example.convidados_app.repository
 
+import android.content.Context
+import android.provider.ContactsContract.Intents.Insert
+import com.example.convidados_app.GuestModel
 
-class GuestRepository private constructor() {
+
+class GuestRepository private constructor(context: Context) {
+
+    /**
+     Porq da variavel guestDataBase
+      - criada essa variavel para nao ocorrer o risco de instaciar o banco mais do que deveria instanciar.
+     **/
+    private val guestDataBase = GuestDataBase(context)
 
     /**
      Singleton
@@ -11,16 +21,23 @@ class GuestRepository private constructor() {
      - singleton é usado para controlar o numero de instancia de uma classe
      - se priva o construtor e usa o metodo statico chamando o getInstance controlando o acesso, a instancia.
      **/
-
     companion object {
         private lateinit var repository: GuestRepository
 
-        fun getInstance(): GuestRepository {
+        fun getInstance(context: Context): GuestRepository {
             if (!::repository.isInitialized) {
-                repository = GuestRepository()
+                repository = GuestRepository(context)
             }
             return repository
         }
+    }
+
+    fun insert () {
 
     }
+
+    fun update () {
+
+    }
+
 }
