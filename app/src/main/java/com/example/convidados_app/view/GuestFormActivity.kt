@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.convidados_app.GuestModel
 import com.example.convidados_app.viewmodel.GuestFormViewModel
 import com.example.convidados_app.R
 import com.example.convidados_app.databinding.ActivityGuestFormBinding
+import com.example.convidados_app.model.GuestModel
 
 class GuestFormActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -24,6 +24,7 @@ class GuestFormActivity : AppCompatActivity(), View.OnClickListener {
         viewmodel = ViewModelProvider(this).get(GuestFormViewModel::class.java)
 
         binding.buttonSave.setOnClickListener(this)
+        binding.radioPresent.isChecked = true
 
         supportActionBar?.hide()
 
@@ -31,9 +32,12 @@ class GuestFormActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onClick(v: View) {
-        if(v.id == R.id.button_save){
+        if (v.id == R.id.button_save) {
+            val name = binding.editNome.text.toString()
+            val presence = binding.radioPresent.isChecked
 
-            //view.save(GuestModel(10, "xxx", false))
+            val model = GuestModel(0, name, presence)
+            viewmodel.insert(model)
 
         }
     }
