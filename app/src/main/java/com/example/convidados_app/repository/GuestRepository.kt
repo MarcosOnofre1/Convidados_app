@@ -17,7 +17,7 @@ class GuestRepository private constructor(context: Context) {
 
     /**
     Singleton
-    usando assim, nos podemos usar o getInstance quantas vezes quiser, que nao vai nunca ser inicializado 2x, pois se o getInstance
+    usando assim, nos podemos usar o fun getInstance quantas vezes quiser, que nao vai nunca ser inicializado 2x, pois se o getInstance
     estiver inicializado, ele nao vai chamar o if() e assim ele retorna "repository".
 
     - singleton é usado para controlar o numero de instancia de uma classe
@@ -37,6 +37,7 @@ class GuestRepository private constructor(context: Context) {
     fun insert(guest: GuestModel): Boolean {
         /**
         ANOTAÇÕES DO CODIGO
+
         - writableDatabase
         gravando alguma informação
 
@@ -105,11 +106,11 @@ class GuestRepository private constructor(context: Context) {
 
     fun delete(id: Int): Boolean {
         /**
-         ANOTAÇÕES DE CODIGO
+        ANOTAÇÕES DE CODIGO
 
-         - Aqui, usamos so o ID na fun delete() porq o ID é unico, entao somente com ele conseguimos ja conseguimos deletar quem nos queremos.
+        - Aqui, usamos so o ID na fun delete() porq o ID é unico, entao somente com ele conseguimos ja conseguimos deletar quem nos queremos.
 
-         - no arrayOf(), usamos somente o ID, que com ele ja é o necessario para o args.
+        - no arrayOf(), usamos somente o ID, que com ele ja é o necessario para o args.
          **/
         return try {
             val db = guestDataBase.writableDatabase
@@ -124,7 +125,153 @@ class GuestRepository private constructor(context: Context) {
             false
 
         }
+    }
 
+    fun getAll(): List<GuestModel> {
+        /**
+        ANOTAÇÕES DO CODIGO
+
+        - nesse getAll, fizemos um readable porq vamos consultar os dados.
+
+        - no arrayOf() a ordem que foi posta, temos que obter os dados por essa ordem, nao importa a ordem que voce ponha, com tanto que voce siga a ordem, tudo bem.
+
+        - entendo melhor um pouco do cursor:
+        O cursor, podemos pensar nele como uma "seta", esse cursor que vai te possibilitar de obter os dados.
+        Ele sempre apontará pelo começo da tabela, ele interage, linha por linha, pegando os dados e transformando no objeto que desejamos.
+        O cursor consegue tambem, avisar quando chegou no final da tabela.
+        Tambem consegue avisar, quais e quantas colunas da tabela temos, e tambem, podemos pegar separadamente ou quantas colunas nos quisermos da tabela.
+
+        - No while, a variavel id, o getInt() ele quer saber, numa tabela, (array), qual a index que voce quer mexer. Vamos supor que:
+
+        0,   1,    2
+        id, name, presence
+
+        entao a index do id é 0.
+
+        para boas praticas, voce pode usar o "0" no getInt(), porem, nao é o melhor a se fazer, pois pode haver que voce mude a ordem das colunas (projection), e
+        que a index "0", nao seja index desejada mais, e sem duvidas, pode dar uma Execption.
+
+        - O erro que da na variavel id do while, é erro do android studio.
+
+        - O cursor é como se fosse um arquivo txt. Nos abrimos, escrevemos o conteudo nele e depois fechamos. Entao, apos o conteudo, colocamos o "cursor.closed()".
+         **/
+        val list = mutableListOf<GuestModel>()
+
+        try {
+            val db = guestDataBase.readableDatabase
+
+            val tableName = DataBaseConstants.GUEST.TABLE_NAME
+            val columnsId = DataBaseConstants.GUEST.COLUMNS.ID
+            val columnsName = DataBaseConstants.GUEST.COLUMNS.NAME
+            val columnsPresence = DataBaseConstants.GUEST.COLUMNS.PRESENCE
+
+
+            val projection = arrayOf(
+                columnsId,
+                columnsName,
+                columnsPresence,
+            )
+
+            val cursor =
+                db.query(tableName, projection, null, null, null, null, null)
+
+            if (cursor != null && cursor.count > 0) {
+                while (cursor.moveToNext()) {
+
+                    val id = cursor.getInt(cursor.getColumnIndex(columnsId))
+                    val name = cursor.getString(cursor.getColumnIndex(columnsName))
+                    val presence = cursor.getInt(cursor.getColumnIndex(columnsPresence))
+
+                    list.add(GuestModel(id, name, presence == 1))
+
+                }
+            }
+
+            cursor.close()
+
+        } catch (e: Exception) {
+            return list
+
+        }
+        return list
+    }
+
+    fun getPresent(): List<GuestModel> {
+        /**
+        ANOTAÇÕES DO CODIGO
+
+         - rawQuery, é uma query crua, ele pode ser executado em SQL em formato String. Ou seja, podemos executar comandos no nosso banco, que no nosso caso,
+         vamos fazer um comando de consulta.
+
+        **/
+        val list = mutableListOf<GuestModel>()
+
+        try {
+            val db = guestDataBase.readableDatabase
+
+            val columnsId = DataBaseConstants.GUEST.COLUMNS.ID
+            val columnsName = DataBaseConstants.GUEST.COLUMNS.NAME
+            val columnsPresence = DataBaseConstants.GUEST.COLUMNS.PRESENCE
+
+            val cursor = db.rawQuery("SELECT id, name, presence FROM Guest WHERE presence = 1", null)
+
+            if (cursor != null && cursor.count > 0) {
+                while (cursor.moveToNext()) {
+
+                    val id = cursor.getInt(cursor.getColumnIndex(columnsId))
+                    val name = cursor.getString(cursor.getColumnIndex(columnsName))
+                    val presence = cursor.getInt(cursor.getColumnIndex(columnsPresence))
+
+                    list.add(GuestModel(id, name, presence == 1))
+
+                }
+            }
+
+            cursor.close()
+
+        } catch (e: Exception) {
+            return list
+
+        }
+        return list
+    }
+
+    fun getAbsent(): List<GuestModel> {
+        /**
+        ANOTAÇÕES DO CODIGO
+
+         -
+         **/
+        val list = mutableListOf<GuestModel>()
+
+        try {
+            val db = guestDataBase.readableDatabase
+
+            val columnsId = DataBaseConstants.GUEST.COLUMNS.ID
+            val columnsName = DataBaseConstants.GUEST.COLUMNS.NAME
+            val columnsPresence = DataBaseConstants.GUEST.COLUMNS.PRESENCE
+
+            val cursor = db.rawQuery("SELECT id, name, presence FROM Guest WHERE presence = 0", null)
+
+            if (cursor != null && cursor.count > 0) {
+                while (cursor.moveToNext()) {
+
+                    val id = cursor.getInt(cursor.getColumnIndex(columnsId))
+                    val name = cursor.getString(cursor.getColumnIndex(columnsName))
+                    val presence = cursor.getInt(cursor.getColumnIndex(columnsPresence))
+
+                    list.add(GuestModel(id, name, presence == 1))
+
+                }
+            }
+
+            cursor.close()
+
+        } catch (e: Exception) {
+            return list
+
+        }
+        return list
     }
 
 }
