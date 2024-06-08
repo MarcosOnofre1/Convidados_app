@@ -2,6 +2,7 @@ package com.example.convidados_app.repository
 
 import android.content.ContentValues
 import android.content.Context
+import android.provider.ContactsContract.Data
 import com.example.convidados_app.constants.DataBaseConstants
 import com.example.convidados_app.model.GuestModel
 import java.lang.Exception
@@ -44,14 +45,14 @@ class GuestRepository private constructor(context: Context) {
         - readableDatabase
         consultando alguma informação
 
-        - usamos o insert por ser mais seguro, para evitar erros de digitação das colunas etc. Ja no "nullColumnHack", o SQL nao permite que a inserção de uma linha,
+        - usamos o insert por ser mais seguro, para evitar erros de digitação das colunas e etc. Ja no "nullColumnHack", o SQL nao permite que a inserção de uma linha,
         com todos os valores nulos. Ou seja, "nullColumnHack", voce fornece um valor para ele e ele te ajuda assim, a nao deixar que essa linha fique nula.
         Porem, no nosso caso, ele nao vai ser necessario, pois na nossa coluna, o ID é um autoincrement, entao nao deixará que fique nula.
 
         - ContentValues() -> Content (conteudo), ele vai carregar os conteudos para o nosso banco.
 
         - fizemos esse if ->  "val presence =  if (guest.presence) 1 else 0" para deixar o "presence" como inteiro, ja que ele ta como Boolean no GuestModel e no
-        GuestDataBse ele recebe um inteiro, Entao foi feito esse if() para converter o Boolean para Int.
+        GuestDataBase ele recebe um inteiro, Entao foi feito esse if() para converter o Boolean para Int.
 
         - Fez um Try Catch para evitar Exception
          **/
@@ -59,12 +60,17 @@ class GuestRepository private constructor(context: Context) {
             val db = guestDataBase.writableDatabase
             val presence = if (guest.presence) 1 else 0
 
-            val values = ContentValues()
-            values.put(DataBaseConstants.GUEST.COLUMNS.NAME, guest.name)
-            values.put(DataBaseConstants.GUEST.COLUMNS.PRESENCE, presence)
+            val tableName = DataBaseConstants.GUEST.TABLE_NAME
+            val columnsName = DataBaseConstants.GUEST.COLUMNS.NAME
+            val columnsPresence = DataBaseConstants.GUEST.COLUMNS.PRESENCE
 
-            db.insert(DataBaseConstants.GUEST.TABLE_NAME, null, values)
+            val values = ContentValues()
+            values.put(columnsName, guest.name)
+            values.put(columnsPresence, presence)
+
+            db.insert(tableName, null, values)
             true
+
         } catch (e: Exception) {
             false
 
@@ -88,16 +94,21 @@ class GuestRepository private constructor(context: Context) {
             val db = guestDataBase.writableDatabase
             val presence = if (guest.presence) 1 else 0
 
-            val values = ContentValues()
-            values.put(DataBaseConstants.GUEST.COLUMNS.NAME, guest.name)
-            values.put(DataBaseConstants.GUEST.COLUMNS.PRESENCE, presence)
+            val tableName = DataBaseConstants.GUEST.TABLE_NAME
+            val columnsId = DataBaseConstants.GUEST.COLUMNS.ID
+            val columnsName = DataBaseConstants.GUEST.COLUMNS.NAME
+            val columnsPresence = DataBaseConstants.GUEST.COLUMNS.PRESENCE
 
-            val selection = DataBaseConstants.GUEST.COLUMNS.ID + " = ?"
+            val values = ContentValues()
+            values.put(columnsName, guest.name)
+            values.put(columnsPresence, presence)
+
+            val selection = "$columnsId = ?"
             val args = arrayOf(guest.id.toString())
 
-            db.update(DataBaseConstants.GUEST.TABLE_NAME, values, selection, args)
-
+            db.update(tableName, values, selection, args)
             true
+
         } catch (e: Exception) {
             false
 
@@ -108,19 +119,22 @@ class GuestRepository private constructor(context: Context) {
         /**
         ANOTAÇÕES DE CODIGO
 
-        - Aqui, usamos so o ID na fun delete() porq o ID é unico, entao somente com ele conseguimos ja conseguimos deletar quem nos queremos.
+        - Aqui, usamos so o ID na .delete() porq o ID é unico, entao somente com ele conseguimos ja conseguimos deletar quem nos queremos.
 
         - no arrayOf(), usamos somente o ID, que com ele ja é o necessario para o args.
          **/
         return try {
             val db = guestDataBase.writableDatabase
 
-            val selection = DataBaseConstants.GUEST.COLUMNS.ID + " = ?"
+            val tableName = DataBaseConstants.GUEST.TABLE_NAME
+            val columnsId = DataBaseConstants.GUEST.COLUMNS.ID
+
+            val selection = "$columnsId = ?"
             val args = arrayOf(id.toString())
 
-            db.delete(DataBaseConstants.GUEST.TABLE_NAME, selection, args)
-
+            db.delete(tableName, selection, args)
             true
+
         } catch (e: Exception) {
             false
 
@@ -178,15 +192,17 @@ class GuestRepository private constructor(context: Context) {
             if (cursor != null && cursor.count > 0) {
                 while (cursor.moveToNext()) {
 
-                    val id = cursor.getInt(cursor.getColumnIndex(columnsId))
-                    val name = cursor.getString(cursor.getColumnIndex(columnsName))
-                    val presence = cursor.getInt(cursor.getColumnIndex(columnsPresence))
+                    val id =
+                        cursor.getInt(cursor.getColumnIndex(columnsId))
+                    val name =
+                        cursor.getString(cursor.getColumnIndex(columnsName))
+                    val presence =
+                        cursor.getInt(cursor.getColumnIndex(columnsPresence))
 
                     list.add(GuestModel(id, name, presence == 1))
 
                 }
             }
-
             cursor.close()
 
         } catch (e: Exception) {
@@ -226,7 +242,6 @@ class GuestRepository private constructor(context: Context) {
 
                 }
             }
-
             cursor.close()
 
         } catch (e: Exception) {
@@ -237,11 +252,7 @@ class GuestRepository private constructor(context: Context) {
     }
 
     fun getAbsent(): List<GuestModel> {
-        /**
-        ANOTAÇÕES DO CODIGO
 
-         -
-         **/
         val list = mutableListOf<GuestModel>()
 
         try {
@@ -264,7 +275,6 @@ class GuestRepository private constructor(context: Context) {
 
                 }
             }
-
             cursor.close()
 
         } catch (e: Exception) {
