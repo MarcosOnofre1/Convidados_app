@@ -21,6 +21,8 @@ class AllGuestsViewModel(application: Application) : AndroidViewModel(applicatio
      - tiramos o tipo do repository, porq conseguimos inferir o GuetRepository. (antes estava como latenit var)
 
      - atribuimos o listAllGuests.value para o repository pegar a list
+
+     - Adicionamos o delete() chamando o id
      **/
     private val repository = GuestRepository.getInstance(application.applicationContext)
 
@@ -29,5 +31,9 @@ class AllGuestsViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun getAll() {
         listAllGuests.value = repository.getAll()
+    }
+
+    fun delete(id: Int) {
+        repository.delete(id)
     }
 }

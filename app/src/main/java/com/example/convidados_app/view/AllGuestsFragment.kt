@@ -5,12 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.convidados_app.databinding.FragmentAllGuestsBinding
 import com.example.convidados_app.view.adapter.GuestsAdapter
+import com.example.convidados_app.view.listener.OnGuestListener
 import com.example.convidados_app.viewmodel.AllGuestsViewModel
 
 class AllGuestsFragment : Fragment() {
@@ -46,6 +48,20 @@ class AllGuestsFragment : Fragment() {
 
         // Adapter
         binding.recycleAllGuests.adapter = adapter
+
+        val listener = object : OnGuestListener {
+            override fun onClick(id: Int) {
+                Toast.makeText(context,"aaaaaaaaaaa", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onDelete(id: Int) {
+                viewModel.delete(id)
+                viewModel.getAll()
+            }
+
+        }
+
+        adapter.attachListener(listener)
 
         viewModel.getAll()
 

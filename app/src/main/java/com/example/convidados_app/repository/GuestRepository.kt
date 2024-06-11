@@ -45,7 +45,7 @@ class GuestRepository private constructor(context: Context) {
         - readableDatabase
         consultando alguma informação
 
-        - usamos o insert por ser mais seguro, para evitar erros de digitação das colunas e etc. Ja no "nullColumnHack", o SQL nao permite que a inserção de uma linha,
+        - usamos o .insert por ser mais seguro, para evitar erros de digitação das colunas e etc. Ja no "nullColumnHack", o SQL nao permite que a inserção de uma linha,
         com todos os valores nulos. Ou seja, "nullColumnHack", voce fornece um valor para ele e ele te ajuda assim, a nao deixar que essa linha fique nula.
         Porem, no nosso caso, ele nao vai ser necessario, pois na nossa coluna, o ID é um autoincrement, entao nao deixará que fique nula.
 
@@ -56,6 +56,7 @@ class GuestRepository private constructor(context: Context) {
 
         - Fez um Try Catch para evitar Exception
          **/
+
         return try {
             val db = guestDataBase.writableDatabase
             val presence = if (guest.presence) 1 else 0
@@ -90,6 +91,7 @@ class GuestRepository private constructor(context: Context) {
 
         - usamos o .toString() no arrayOf, porq ele estava encontrando um inteiro, que no caso, queremos uma string.
          **/
+
         return try {
             val db = guestDataBase.writableDatabase
             val presence = if (guest.presence) 1 else 0
@@ -169,6 +171,7 @@ class GuestRepository private constructor(context: Context) {
 
         - O cursor é como se fosse um arquivo txt. Nos abrimos, escrevemos o conteudo nele e depois fechamos. Entao, apos o conteudo, colocamos o "cursor.closed()".
          **/
+
         val list = mutableListOf<GuestModel>()
 
         try {

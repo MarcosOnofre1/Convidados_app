@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.convidados_app.databinding.RowGuestBinding
 import com.example.convidados_app.model.GuestModel
+import com.example.convidados_app.view.listener.OnGuestListener
 import com.example.convidados_app.view.viewholder.GuestViewHolder
 
 class GuestsAdapter: RecyclerView.Adapter<GuestViewHolder>() {
@@ -35,12 +36,18 @@ class GuestsAdapter: RecyclerView.Adapter<GuestViewHolder>() {
 
      - Se por acaso tivemos um cenario, onde a RecycleView é criada e depois a lista é recebida, pode ser que a ReciclerView nao saiba que ela tem que se atualizar, nesse
      caso usamos o notifyDataSetChanged() que a sua função é notificar a ReciclerView faz com que ela se atualize, se crie denovo.
+
+     * Atribuição para o setOnClickListener
+     - Criamos a variavel "private lateinit var listener: OnGuestListener", colocamos no "onCreateViewHolder", porem essa variavel nao foi atribuida ainda, entao foi criado
+     a "fun attachListener()" para receber esse valor.
      **/
 
     private var guestList: List<GuestModel> = listOf()
+    private lateinit var listener: OnGuestListener
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GuestViewHolder {
         val item = RowGuestBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return GuestViewHolder(item)
+        return GuestViewHolder(item, listener)
     }
 
     override fun onBindViewHolder(holder: GuestViewHolder, position: Int) {
@@ -54,6 +61,9 @@ class GuestsAdapter: RecyclerView.Adapter<GuestViewHolder>() {
     fun updateGuests(list: List<GuestModel>) {
         guestList = list
         notifyDataSetChanged()
+    }
 
+    fun attachListener(guestListener: OnGuestListener) {
+        listener = guestListener
     }
 }
