@@ -215,14 +215,77 @@ class GuestRepository private constructor(context: Context) {
         return list
     }
 
+    fun get(id: Int): GuestModel? {
+        /**
+        ANOTAÇÕES DO CODIGO
+
+        - mesmas anotações que o getAll()
+
+        - adicionamos o selection e o args
+
+        - agora nao vamos mais tratar de uma lista aqui, e sim um elemento somente, entao, vamos buscar o ID,
+        ele é chave primaria, ou seja, é um elemento somente.
+
+         - usamos o guet: GuestModel e mudamos o list pra guest.
+
+        - GuestModel do get() esse item nao aceite nulo, e o return guest, retorna nulo, pois nunca foi incializado. Para corrigir isso
+         fazemos com que ele aceite nulo, entao interpolamos "? = null" -> "var guest: GuestModel? = null"
+
+         **/
+
+        var guest: GuestModel? = null
+
+        try {
+            val db = guestDataBase.readableDatabase
+
+            val tableName = DataBaseConstants.GUEST.TABLE_NAME
+            val columnsId = DataBaseConstants.GUEST.COLUMNS.ID
+            val columnsName = DataBaseConstants.GUEST.COLUMNS.NAME
+            val columnsPresence = DataBaseConstants.GUEST.COLUMNS.PRESENCE
+
+
+            val projection = arrayOf(
+                columnsId,
+                columnsName,
+                columnsPresence,
+            )
+
+            val selection = "$columnsId = ?"
+            val args = arrayOf(id.toString())
+
+
+            val cursor =
+                db.query(tableName, projection, selection, args, null, null, null)
+
+            if (cursor != null && cursor.count > 0) {
+                while (cursor.moveToNext()) {
+
+                    val name =
+                        cursor.getString(cursor.getColumnIndex(columnsName))
+                    val presence =
+                        cursor.getInt(cursor.getColumnIndex(columnsPresence))
+
+                    guest = GuestModel(id, name, presence == 1)
+
+                }
+            }
+            cursor.close()
+
+        } catch (e: Exception) {
+            return guest
+
+        }
+        return guest
+    }
+
     fun getPresent(): List<GuestModel> {
         /**
         ANOTAÇÕES DO CODIGO
 
-         - rawQuery, é uma query crua, ele pode ser executado em SQL em formato String. Ou seja, podemos executar comandos no nosso banco, que no nosso caso,
-         vamos fazer um comando de consulta.
+        - rawQuery, é uma query crua, ele pode ser executado em SQL em formato String. Ou seja, podemos executar comandos no nosso banco, que no nosso caso,
+        vamos fazer um comando de consulta.
 
-        **/
+         **/
         val list = mutableListOf<GuestModel>()
 
         try {
@@ -232,7 +295,8 @@ class GuestRepository private constructor(context: Context) {
             val columnsName = DataBaseConstants.GUEST.COLUMNS.NAME
             val columnsPresence = DataBaseConstants.GUEST.COLUMNS.PRESENCE
 
-            val cursor = db.rawQuery("SELECT id, name, presence FROM Guest WHERE presence = 1", null)
+            val cursor =
+                db.rawQuery("SELECT id, name, presence FROM Guest WHERE presence = 1", null)
 
             if (cursor != null && cursor.count > 0) {
                 while (cursor.moveToNext()) {
@@ -265,7 +329,8 @@ class GuestRepository private constructor(context: Context) {
             val columnsName = DataBaseConstants.GUEST.COLUMNS.NAME
             val columnsPresence = DataBaseConstants.GUEST.COLUMNS.PRESENCE
 
-            val cursor = db.rawQuery("SELECT id, name, presence FROM Guest WHERE presence = 0", null)
+            val cursor =
+                db.rawQuery("SELECT id, name, presence FROM Guest WHERE presence = 0", null)
 
             if (cursor != null && cursor.count > 0) {
                 while (cursor.moveToNext()) {
