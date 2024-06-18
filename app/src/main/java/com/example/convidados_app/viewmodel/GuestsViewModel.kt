@@ -4,11 +4,10 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.example.convidados_app.model.GuestModel
 import com.example.convidados_app.repository.GuestRepository
 
-class AllGuestsViewModel(application: Application) : AndroidViewModel(application) {
+class GuestsViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      ANOTAÇÃO DE CODIGO
@@ -31,6 +30,14 @@ class AllGuestsViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun getAll() {
         listAllGuests.value = repository.getAll()
+    }
+
+    fun getPresent() {
+        listAllGuests.value = repository.getPresent()
+    }
+
+    fun getAbsent() {
+        listAllGuests.value = repository.getAbsent()
     }
 
     fun delete(id: Int) {

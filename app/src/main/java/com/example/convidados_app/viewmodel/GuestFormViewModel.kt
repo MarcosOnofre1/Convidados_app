@@ -18,23 +18,34 @@ class GuestFormViewModel(application: Application) : AndroidViewModel(applicatio
      - para buscar os dados quando clicka no convidado, usamos o guestModel.values = repository.get(id)
 
      - chamando o save pra tanto pra att quanto pra savar
+
+     *Criação do saveGuest
+      - o saveguest agora recebe o reotirno de insert e  de update.
+     -  agora pode ser capaz de ser observado na nossa fun observe() do GuestFormAcitivty
      **/
     private val repository = GuestRepository.getInstance(application)
 
     private val guestModel = MutableLiveData<GuestModel>()
     val guest: LiveData<GuestModel> = guestModel
 
-    fun insert(guest: GuestModel){
-        // esse .insert é do GuestRepository
-        repository.insert(guest)
-
-    }
+    private val _saveGuest = MutableLiveData<String>()
+    val saveGuest: LiveData<String> = _saveGuest
 
     fun save(guest: GuestModel){
         if (guest.id == 0){
-            repository.insert(guest)
+            if(repository.insert(guest)){
+                _saveGuest.value = "Inserção feita com sucesso!"
+            } else {
+                _saveGuest.value = "Falha"
+
+            }
         } else {
-            repository.update(guest)
+            if(repository.update(guest)){
+                _saveGuest.value = "Atualização feita com sucesso!"
+            } else {
+                _saveGuest.value = "Falha"
+
+            }
         }
 
     }

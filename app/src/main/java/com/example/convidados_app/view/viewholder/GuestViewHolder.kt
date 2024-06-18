@@ -60,6 +60,7 @@ class GuestViewHolder(private val bind: RowGuestBinding, private val listener: O
                 .setPositiveButton("Sim", object : DialogInterface.OnClickListener {
                     override fun onClick(dialog: DialogInterface?, which: Int) {
                         listener.onDelete(guest.id)
+
                     }
                 })
                 .create()
