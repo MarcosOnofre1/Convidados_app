@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.kotlinKapt)
 }
 
 android {
@@ -49,6 +50,12 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.activity)
+
+    implementation(libs.kotlinStdlib)
+    implementation(libs.roomRuntime)
+    // lembrando que optamos por usar o kapt, mas o ideal é fazer a mudança para o KSP.
+    kapt(libs.roomCompiler)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
